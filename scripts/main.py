@@ -1,4 +1,5 @@
 from pathlib import Path
+from functools import partial
 
 import gradio as gr
 
@@ -15,6 +16,10 @@ class Script(scripts.Script):
 
     def ui(self, is_img2img):
         return ()
+
+
+def gallery_refresh(directory: Path):
+    return sorted(map(str, directory.glob("*.png")), reverse=True)
 
 
 def gallery_event(elem_id):
@@ -40,13 +45,27 @@ def outputs_tab():
                             continue
 
                         with gr.Accordion(date_directory.name, open=False):
+                            refresh_btn = gr.Button(
+                                value="Refresh", label="Refresh", disabled=True
+                            )
 
                             gallery = gr.Gallery(
                                 label="Generated images",
                                 show_label=False,
-                                value=sorted(map(str, date_directory.glob("*.png"))),
+                                value=sorted(
+                                    map(str, date_directory.glob("*.png")), reverse=True
+                                ),
                                 elem_id=f"{task_directory}_{date_directory}",
                             ).style(grid=[8], height="auto")
+
+                            refresh_btn.click(
+                                partial(
+                                    gallery_refresh,
+                                    directory=date_directory,
+                                ),
+                                inputs=[],
+                                outputs=[gallery],
+                            )
 
         return [(outputs_tab, "Outputs", "outputs_tab")]
 
