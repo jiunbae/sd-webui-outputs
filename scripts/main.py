@@ -35,12 +35,14 @@ def outputs_tab():
             gr.Button(value="Output Empty", label="Output Empty", disabled=True)
 
         else:
-            for task_directory in sorted(output_directory.iterdir()):
+            for task_directory in sorted(output_directory.iterdir(), reverse=True):
                 if not task_directory.is_dir():
                     continue
 
                 with gr.Accordion(task_directory.name, open=True):
-                    for date_directory in sorted(task_directory.iterdir()):
+                    for date_directory in sorted(
+                        task_directory.iterdir(), reverse=True
+                    ):
                         if not date_directory.is_dir():
                             continue
 
